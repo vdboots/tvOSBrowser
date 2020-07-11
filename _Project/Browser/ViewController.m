@@ -54,6 +54,8 @@ static UIImage *kPointerCursor() {
 @property (readonly) CGFloat topMenuBrowserOffset;
 @property UITapGestureRecognizer *touchSurfaceDoubleTapRecognizer;
 @property UITapGestureRecognizer *playPauseDoubleTapRecognizer;
+@property BOOL firstLogin;
+@property int firstSession;
 
 @end
 
@@ -82,9 +84,11 @@ static UIImage *kPointerCursor() {
 -(void)loadHomePage {
     if ([[NSUserDefaults standardUserDefaults] stringForKey:@"homepage"] != nil) {
         [self.webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"homepage"]]]];
+
     }
     else {
-        [self.webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: @"http://www.google.com"]]];
+        [self.webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: @"https://heroint--herotest.lightning.force.com/lightning/r/Dashboard/01Z0X0000005pr0UAA/view?queryScope=userFolders"]]];
+        
     }
 }
 -(void)initWebView {
@@ -99,6 +103,8 @@ static UIImage *kPointerCursor() {
     
     //[self.view addSubview: self.webview];
     [self.browserContainerView addSubview: self.webview];
+    
+    
 
     [self.webview setFrame:self.view.bounds];
     [self.webview setDelegate:self];
@@ -128,11 +134,13 @@ static UIImage *kPointerCursor() {
     scrollView.panGestureRecognizer.allowedTouchTypes = @[ @(UITouchTypeIndirect) ];
     scrollView.scrollEnabled = NO;
     
+    
     [self.webview setUserInteractionEnabled:NO];
 }
 -(void)viewDidLoad {
     [super viewDidLoad];
     self.definesPresentationContext = YES;
+    
     
     [self initWebView];
     self.scrollViewAllowBounces = YES;
@@ -884,6 +892,19 @@ static UIImage *kPointerCursor() {
     NSArray *toStoreArray = historyArray;
     [[NSUserDefaults standardUserDefaults] setObject:toStoreArray forKey:@"HISTORY"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    if(_firstSession <= 1) {
+    [webView stringByEvaluatingJavaScriptFromString:@"document.getElementById('username').value = 'vincent.boots@hero.eu.herotest'"];
+    [webView stringByEvaluatingJavaScriptFromString:@"document.getElementById(\'password\').value = '6UsI!6VWx6!U'"];
+        [webView stringByEvaluatingJavaScriptFromString:@"var waitForEl = function(selector, callback) {if (jQuery(selector).length) { callback();} else {       setTimeout(function() {         waitForEl(selector, callback);       }, 100);     }   };   waitForEl('Login', function() {     document.getElementById('Login').click();;   });;"];
+        _firstSession + 1;
+        //_firstLogin = true;
+        [self hideTopNav];
+        
+    }
+
+
+
 }
 - (BOOL)webView:(id)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(NSInteger)navigationType {
     self.requestURL = request.URL.absoluteString;
